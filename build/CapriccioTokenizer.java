@@ -22,7 +22,7 @@ public class CapriccioTokenizer implements Tokenizer {
             new TokenTemplate("\\(", TokenType.OPEN_PARENTHESIS),
             new TokenTemplate("\\)", TokenType.CLOSE_PARENTHESIS),
             // Free-form identifiers and integers.
-            new TokenTemplate("\\b[0-9]+\\b", TokenType.INTEGER),
+            new TokenTemplate("-?[0-9]+\\b", TokenType.INTEGER),
             new TokenTemplate("\\b[a-zA-Z_]\\w*\\b", TokenType.IDENTIFIER),
     };
 

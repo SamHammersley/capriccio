@@ -1,4 +1,4 @@
-import java.util.Scanner;
+import java.util.*;
 import java.io.*;
 
 /**
@@ -6,6 +6,7 @@ import java.io.*;
  *
  * @since 23/11/19
  * @author Saul Johnson <saul.a.johnson@gmail.com>
+ * @author Sam Hammersley - Gonsalves
  */
 public class Main {
 
@@ -21,42 +22,82 @@ public class Main {
     }
 
     /**
+     * Takes an array of files, accepting directories or .math source files, maps the name of the file to the
+     * string contents of the file. This function will read .math files one directory deep; nested directories are
+     * not walked, excluding any source files in them.
+     *
+     * @param files the files to be read as .math source.
+     * @return a map of file names to corresponding sources.
+     * @throws FileNotFoundException if a file could not be found
+     */
+    private static Map<String, String> readInputFiles(File...files) throws FileNotFoundException {
+        Map<String, String> sources = new HashMap<>();
+
+        for (File file : files) {
+
+            if (file.isDirectory()) {
+                File[] sub = file.listFiles((dir, name) -> name.endsWith(".math"));
+
+                if (sub == null) {
+                    continue;
+                }
+
+                sources.putAll(readInputFiles(sub));
+            } else {
+                // Read source from file.
+                String source = readFileText(file.toString());
+
+                sources.put(file.toString(), source);
+            }
+        }
+
+        return sources;
+    }
+
+    /**
      * The program main method.
      *
      * @param args  the command-line arguments passed
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         // No file passed? Exit with error.
         if (args.length == 0) {
-            System.err.println("Please pass an input file.");
+            System.err.println("Please pass an input file, a space-separated list of input files or a directory containing input files.");
             System.exit(1);
         }
 
-        // Now try interpretation of source file.
-        String inputFile = args[0];
-        try {
-            // Read source file.
-            String source = readFileText(inputFile);
+        // Tokenize file and put tokens in a stream.
+        Tokenizer tokenizer = new CapriccioTokenizer();
 
-            // Tokenize file and put tokens in a stream.
-            Tokenizer tokenizer = new CapriccioTokenizer();
+        // Set up evaluator with user-specified functions.
+        Evaluator evaluator = new Evaluator();
+        {{ function_registration }}
+
+        File[] inputFiles = Arrays.stream(args).map(File::new).toArray(File[]::new);
+
+        Map<String, String> sources = readInputFiles(inputFiles);
+
+        sources.forEach((x, y) -> System.out.println(x + " : " + evaluate(tokenizer, evaluator, y)));
+    }
+
+    /**
+     * Evaluates the given source code with the given tokenizer and evaluator.
+     *
+     * @param tokenizer the tokenizer to tokenize the source.
+     * @param evaluator evaluates the given source expression.
+     * @param source the source expression, that is parsed and evaluated.
+     * @return the integer result returned from the evaluation of the given source expression.
+     */
+    private static int evaluate(Tokenizer tokenizer, Evaluator evaluator, String source) {
+        try {
             TokenStream tokenStream = new TokenStream(tokenizer.tokenize(source));
 
             // Parse token stream.
             Expression program = Expression.parse(tokenStream);
 
-            // Set up evaluator with user-specified functions.
-            Evaluator evaluator = new Evaluator();
-            {{ function_registration }}
-
-            // Actually print program result.
-            System.out.println(evaluator.evaluate(program));
-        } catch (FileNotFoundException e) {
-
-            // File not found.
-            System.err.println("Error: Input file '" + inputFile + "' not found.");
-            System.exit(1);
+            // Return program result.
+            return evaluator.evaluate(program);
         } catch (TokenizationException e) {
 
             // Tokenizer rejected source.
@@ -73,5 +114,8 @@ public class Main {
             System.err.println(e.getMessage());
             System.exit(1);
         }
+
+        throw new RuntimeException("Failed to evaluate the given source!");
     }
+
 }

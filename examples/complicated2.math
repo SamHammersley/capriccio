@@ -1,0 +1,10 @@
+(equals 141
+  (ifelse (morethan (tri 5) (factorial 5))
+    (ifelse (lessthan (tri 10) (factorial 2))
+      (quotient (factorial 2) (tri 10))
+      (quotient (tri 10) (factorial 2)))
+    (ifelse (equals (sum 54 87) (multiply 5 15))
+      (subtract (sum 54 87) (multiply 5 15))
+      (ifelse (morethan (sum 54 87) (multiply 5 15))
+        (max (sum 54 87) (multiply 5 15))
+        (min (sum 54 87) (multiply 5 15))))))

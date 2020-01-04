@@ -1,0 +1,1 @@
+(equals -20 (subtract 4 24))

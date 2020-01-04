@@ -1,0 +1,6 @@
+(equals 0
+  (ifelse (morethan (tri 5) (factorial 5))
+    (ifelse (lessthan (tri 10) (factorial 2))
+      (quotient (factorial 2) (tri 10))
+      (quotient (tri 10) (factorial 2)))
+    (modulo (factorial 5) (tri 5))))

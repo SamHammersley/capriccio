@@ -1,0 +1,1 @@
+(equals 2 (factorial 2))

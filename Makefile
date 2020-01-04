@@ -6,6 +6,10 @@ main:
 	make java
 	make classes
 	make standalone
+	make test-examples
+
+test-examples:
+	bash ./test/examples-test.sh
 
 standalone:
 	cd ./build && jar cfe capriccio.jar Main *.class

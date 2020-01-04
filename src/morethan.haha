@@ -1,0 +1,29 @@
+function morethan( a : Z, b : Z ) : Z
+precondition a >= 0 /\ b >= 0
+var x : Z
+	y : Z
+	p : Z
+begin
+	x := a
+	{ a >= 0 /\ b >= 0 /\ x = a }
+	y := b
+	{ a >= 0 /\ b >= 0 /\ x = a /\ y = b }
+	while x != 0 /\ y != 0 do
+	invariant a - x = b - y
+	begin
+		x := x - 1
+		{ a - (x + 1) = b - y }
+		y := y - 1
+		{ a - x = b - y }
+		skip
+	end
+	{ a - x = b - y /\ (x = 0 \/ y = 0) }
+	if (x != 0 /\ y = 0) then 
+		p := 1
+	else 
+		p := 0
+	{ (x != 0 /\ y = 0 /\ p = 1) \/ (x = 0 \/ y != 0 /\ p = 1) }
+	morethan := p
+	{ (x != 0 /\ y = 0 /\ morethan = 1) \/ (x = 0 \/ y != 0 /\ morethan = 1) }
+	skip
+end

@@ -1,0 +1,12 @@
+function min(x : Z, y : Z) : Z
+postcondition (x < y /\ min = x) \/ (x >= y /\ min = y)
+var z : Z
+begin
+    if x < y then
+        z := x
+    else
+        z := y
+        
+    { (x < y /\ z = x) \/ (x >= y /\ z = y) }
+    min := z
+end

@@ -1,0 +1,22 @@
+function tri(n : Z) : Z
+precondition n >= 0
+postcondition tri = (n * (n + 1)) / 2
+var i : Z
+	ans : Z
+begin
+	i := n
+	{n >= 0 /\ i = n}
+	ans := 0
+	{n >= 0 /\ i = n /\ ans = 0}
+	while i != 0 do
+	invariant n >= 0 /\ ans = (n * (n + 1) / 2) - (i * (i + 1) / 2)
+	begin
+		ans := ans + i
+		{n >= 0 /\ ans = (n * (n + 1) / 2) - (i * (i + 1) / 2) + i}
+		i := i - 1
+		{n >= 0 /\ ans = (n * (n + 1) / 2) - (i * (i + 1) / 2)}
+		skip
+	end
+	{i = 0 /\ ans = (n * (n + 1) / 2) - (i * (i + 1) / 2)}
+	tri := ans
+end

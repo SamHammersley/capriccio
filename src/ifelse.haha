@@ -1,0 +1,18 @@
+function ifelse ( p : Z, x : Z, y : Z ) : Z
+precondition p = 0 \/ p = 1
+postcondition (p = 0 /\ ifelse = y) \/ (p = 1 /\ ifelse = x)
+var z : Z
+    begin
+	
+    if p = 1 then
+        begin
+            z := x
+        end
+    else
+        begin
+            z := y
+        end
+	
+    { (p = 0 /\ z = y) \/ (p = 1 /\ z = x) }
+    ifelse := z
+end

@@ -1,0 +1,22 @@
+function multiply(x : Z, y : Z) : Z
+precondition y >= 0
+postcondition multiply = x * y
+var i : Z
+	ans : Z
+begin
+	i := y
+	{y >= 0 /\ i = y}
+	ans := 0
+	{y >= 0 /\ i = y /\ ans = 0}
+	while ¬(i = 0) do
+	invariant y >= 0 /\ ans = x * (y - i)
+	begin
+		ans := ans + x
+		{y >= 0 /\ ans = x * (y - i) + x}
+		i := i - 1
+		{y >= 0 /\ ans = x * (y - i)}
+		skip
+	end
+	{i = 0 /\ ans = x * (y - i)}
+	multiply := ans
+end

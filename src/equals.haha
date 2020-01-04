@@ -1,0 +1,16 @@
+function equals(x : Z, y : Z) : Z
+postcondition (x != y /\ equals = 0) \/ (x = y /\ equals = 1)
+var z : Z
+begin
+	if x - y != 0 then
+	    begin
+		z := 0
+	    end
+	else
+	    begin
+		z := 1
+	    end
+	
+	{ (x != y /\ z = 0) \/ (x = y /\ z = 1) }
+	equals := z
+end

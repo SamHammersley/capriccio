@@ -1,0 +1,22 @@
+function subtract (x : Z, y : Z) : Z
+precondition y >= 0
+postcondition subtract = x - y
+var ans : Z
+    n : Z
+begin
+	ans := x
+	{y >= 0 /\ ans = x}
+	n := y
+	{y >= 0 /\ ans = x /\ n = y}
+	while n != 0 do
+	invariant y >= 0 /\ n >= 0 /\ ans - n = x - y
+	begin
+		ans := ans - 1
+		{y >= 0 /\ n > 0 /\ ans - n + 1 = x - y}
+		n := n - 1
+		{y >= 0 /\ n >= 0 /\ ans - n = x - y}
+		skip
+	end
+	{n = 0 /\ ans = x - y}
+	subtract := ans
+end

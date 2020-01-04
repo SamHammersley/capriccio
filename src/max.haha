@@ -1,0 +1,12 @@
+function max(x : Z, y : Z) : Z
+postcondition (x > y /\ max = x) \/ (x <= y /\ max = y)
+var z : Z
+begin
+    if x > y then
+        z := x
+    else
+        z := y
+        
+    { (x > y /\ z = x) \/ (x <= y /\ z = y) }
+    max := z
+end

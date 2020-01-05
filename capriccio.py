@@ -117,7 +117,9 @@ def gen_reg (class_names):
     for class_name in class_names:
         if len(out) > 0:
             out += '\n            '
-        out += f'evaluator.addFunction(new {class_name}());'
+        #out += f'evaluator.addFunction(new {class_name}());'
+        out += f'new {class_name}(),'
+    out = out.rstrip(',')
     return out
 
 

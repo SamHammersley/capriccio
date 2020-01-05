@@ -70,15 +70,27 @@ public class Main {
         // Tokenize file and put tokens in a stream.
         Tokenizer tokenizer = new CapriccioTokenizer();
 
+        List<NamedFunction<int[], Integer>> funcs = Arrays.asList(
+            {{ function_registration }}
+        );
+
+        if (args[0].equals("-b")) {
+            funcs.stream()
+                .map(NamedFunctionBenchmark::new)
+                .forEach(NamedFunctionBenchmark::runBenchmarkRandomInput);
+            args = Arrays.copyOfRange(args, 1, args.length);
+        }
+
         // Set up evaluator with user-specified functions.
         Evaluator evaluator = new Evaluator();
-        {{ function_registration }}
+        evaluator.addFunctions(funcs);
 
         File[] inputFiles = Arrays.stream(args).map(File::new).toArray(File[]::new);
 
         Map<String, String> sources = readInputFiles(inputFiles);
 
-        sources.forEach((x, y) -> System.out.println(x + " : " + evaluate(tokenizer, evaluator, y)));
+        sources.entrySet().forEach(e -> System.out.println(e.getKey() + ": " + evaluate(tokenizer, evaluator, e)));
+        //sources.forEach((x, y) -> System.out.println(x + " : " + evaluate(tokenizer, evaluator, y)));
     }
 
     /**
@@ -89,7 +101,8 @@ public class Main {
      * @param source the source expression, that is parsed and evaluated.
      * @return the integer result returned from the evaluation of the given source expression.
      */
-    private static int evaluate(Tokenizer tokenizer, Evaluator evaluator, String source) {
+    private static int evaluate(Tokenizer tokenizer, Evaluator evaluator, Map.Entry<String, String> entry) {
+        String source = entry.getValue();
         try {
             TokenStream tokenStream = new TokenStream(tokenizer.tokenize(source));
 
@@ -98,20 +111,9 @@ public class Main {
 
             // Return program result.
             return evaluator.evaluate(program);
-        } catch (TokenizationException e) {
+        } catch (Exception e) {
 
-            // Tokenizer rejected source.
-            System.err.println(e.getMessage());
-            System.exit(1);
-        } catch (ParseException e) {
-
-            // Parser rejected source.
-            System.err.println(e.getMessage());
-            System.exit(1);
-        } catch (EvaluationException e) {
-
-            // Runtime error.
-            System.err.println(e.getMessage());
+            System.err.println("Exception thrown evaluating " + entry.getKey() + "\n" + e.getMessage());
             System.exit(1);
         }
 

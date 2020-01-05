@@ -61,7 +61,7 @@ public class NamedFunctionBenchmark {
      * interpreted).
      */
     private void warmUp(int[] input) {
-        for (int i = 0; i < DEFAULT_EXECUTION_COUNT; i++) {
+        for (int i = 0; i < DEFAULT_EXECUTION_COUNT * 10; i++) {
             function.apply(input);
         }
         warmedUp = true;

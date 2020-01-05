@@ -1,5 +1,4 @@
-import java.util.List;
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * Represents a service capable of evaluating Capriccio expressions.
@@ -25,6 +24,16 @@ public class Evaluator {
      */
     public void addFunction(NamedFunction<int[], Integer> function) {
         functions.add(function);
+    }
+
+    /**
+     * Adds each function of the given collection to those usable from expressions
+     * evaluated by this evaluator.
+     *
+     * @param functions the functions to add
+     */
+    public void addFunctions(Collection<NamedFunction<int[], Integer>> funcs) {
+        functions.addAll(funcs);
     }
 
     /**

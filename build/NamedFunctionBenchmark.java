@@ -24,6 +24,11 @@ public class NamedFunctionBenchmark {
     private final int repetitions;
 
     /**
+     * Whether or not to warm up the JVM before running this benchmark.
+     */
+    private final boolean shouldWarmUp;
+
+    /**
      * Denotes the warm-up state of the jvm (for this benchmark test).
      */
     private boolean warmedUp;
@@ -31,12 +36,17 @@ public class NamedFunctionBenchmark {
     /**
      * The default value for the number of times to execute a function.
      */
-    private static final int DEFAULT_EXECUTION_COUNT = 10_000;
+    private static final int DEFAULT_EXECUTION_COUNT = 100;
 
     /**
      * The default value for the number of times to repeat this benchmark, for average time measurements..
      */
     private static final int DEFAULT_REPETITIONS_COUNT = 100;
+
+    /**
+     * The number of times to call the function for warm up.
+     */
+    private static final int WARM_UP_ITERATIONS = 15_000;
 
     /**
      * Constructs a new {@link NamedFunctionBenchmark} for the given values.
@@ -45,14 +55,15 @@ public class NamedFunctionBenchmark {
      * @param executionCount the number of times the given function should be applied.
      * @param repetitions the number of times to repeat the test.
      */
-    public NamedFunctionBenchmark(NamedFunction<int[], Integer> function, int executionCount, int repetitions) {
+    public NamedFunctionBenchmark(NamedFunction<int[], Integer> function, int executionCount, int repetitions, boolean shouldWarmUp) {
         this.function = function;
         this.executionCount = executionCount;
         this.repetitions = repetitions;
+        this.shouldWarmUp = shouldWarmUp;
     }
 
-    public NamedFunctionBenchmark(NamedFunction<int[], Integer> function) {
-        this(function, DEFAULT_EXECUTION_COUNT, DEFAULT_REPETITIONS_COUNT);
+    public NamedFunctionBenchmark(NamedFunction<int[], Integer> function, boolean shouldWarmUp) {
+        this(function, DEFAULT_EXECUTION_COUNT, DEFAULT_REPETITIONS_COUNT, shouldWarmUp);
     }
 
     /**
@@ -61,7 +72,7 @@ public class NamedFunctionBenchmark {
      * interpreted).
      */
     private void warmUp(int[] input) {
-        for (int i = 0; i < DEFAULT_EXECUTION_COUNT * 10; i++) {
+        for (int i = 0; i < WARM_UP_ITERATIONS; i++) {
             function.apply(input);
         }
         warmedUp = true;
@@ -76,11 +87,11 @@ public class NamedFunctionBenchmark {
      * @param input the int array input for the function.
      */
     public void runBenchmark(int...input) {
-        if (!warmedUp) {
+        if (!warmedUp && shouldWarmUp) {
             warmUp(input);
         }
 
-        List<Long> times = new LinkedList<>();
+        double averageTime = 0;
         for (int i = 0; i < repetitions; i++) {
             long start = System.nanoTime();
 
@@ -89,11 +100,10 @@ public class NamedFunctionBenchmark {
             }
 
             long delta = System.nanoTime() - start;
-            times.add(delta);
+            averageTime = ((averageTime * i) + delta) / (i + 1);
         }
 
-        double averageTime = times.stream().mapToLong(x -> x).average().getAsDouble();
-        System.out.println(function.getName() + "," + averageTime);
+        System.out.println(function.getName() + "," + (averageTime/executionCount));
     }
 
     /**

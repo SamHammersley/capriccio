@@ -75,10 +75,13 @@ public class Main {
         );
 
         if (args[0].equals("-b")) {
+            boolean warmUp = Boolean.parseBoolean(args[1]);
+
             funcs.stream()
-                .map(NamedFunctionBenchmark::new)
+                .map(f -> new NamedFunctionBenchmark(f, warmUp))
                 .forEach(NamedFunctionBenchmark::runBenchmarkRandomInput);
-            args = Arrays.copyOfRange(args, 1, args.length);
+
+            return;
         }
 
         // Set up evaluator with user-specified functions.

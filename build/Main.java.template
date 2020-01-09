@@ -77,10 +77,19 @@ public class Main {
         if (args[0].equals("-b")) {
             boolean warmUp = Boolean.parseBoolean(args[1]);
 
-            funcs.stream()
-                .map(f -> new NamedFunctionBenchmark(f, warmUp))
-                .forEach(NamedFunctionBenchmark::runBenchmarkRandomInput);
+            if (args.length > 2) {
+                String functionName = args[2];
 
+                for (NamedFunction<int[], Integer> f : funcs) {
+                    if (f.getName().equalsIgnoreCase(functionName)) {
+                        new NamedFunctionBenchmark(f, warmUp).runBenchmarkRandomInput();
+                    }
+                }
+            } else {
+                funcs.stream()
+                    .map(f -> new NamedFunctionBenchmark(f, warmUp))
+                    .forEach(NamedFunctionBenchmark::runBenchmarkRandomInput);
+            }
             return;
         }
 

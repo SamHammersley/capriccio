@@ -102,8 +102,7 @@ public class Main {
 
         Map<String, String> sources = readInputFiles(inputFiles);
 
-        sources.entrySet().forEach(e -> System.out.println(e.getKey() + ": " + evaluate(tokenizer, evaluator, e)));
-        //sources.forEach((x, y) -> System.out.println(x + " : " + evaluate(tokenizer, evaluator, y)));
+        sources.forEach((x, y) -> System.out.println(x + " : " + evaluate(tokenizer, evaluator, y, x)));
     }
 
     /**
@@ -112,10 +111,10 @@ public class Main {
      * @param tokenizer the tokenizer to tokenize the source.
      * @param evaluator evaluates the given source expression.
      * @param source the source expression, that is parsed and evaluated.
+     * @param file the file containing the program.
      * @return the integer result returned from the evaluation of the given source expression.
      */
-    private static int evaluate(Tokenizer tokenizer, Evaluator evaluator, Map.Entry<String, String> entry) {
-        String source = entry.getValue();
+    private static int evaluate(Tokenizer tokenizer, Evaluator evaluator, String source, String file) {
         try {
             TokenStream tokenStream = new TokenStream(tokenizer.tokenize(source));
 
@@ -126,7 +125,7 @@ public class Main {
             return evaluator.evaluate(program);
         } catch (Exception e) {
 
-            System.err.println("Exception thrown evaluating " + entry.getKey() + "\n" + e.getMessage());
+            System.err.println("Exception thrown evaluating " + file + "\n" + e.getMessage());
             System.exit(1);
         }
 

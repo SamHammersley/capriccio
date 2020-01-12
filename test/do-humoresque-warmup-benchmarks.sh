@@ -3,7 +3,7 @@ parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
 
 cd "$parent_path"/..
 
-echo "Functions,Times" >> test/manual-benchmarks.csv
+echo "Functions,Times" >> test/warmup-humoresque-benchmarks.csv
 files=$(ls -1 examples/benchmarks)
 readarray -t fileArray <<<$files
 
@@ -14,8 +14,9 @@ do
   fileName=${fileArray[i]}
   for (( j = 0; j < $executions; j++ ))
   do
-    x=$(java -cp build ManualFunctionBenchmarks ${fileName%%.*})
+    x=$(java -jar build/capriccio.jar -b true 1 ${fileName%%.*})
   done
 
-  echo $x >> test/manual-benchmarks.csv
+  echo $x >> test/warmup-humoresque-benchmarks.csv
 done
+

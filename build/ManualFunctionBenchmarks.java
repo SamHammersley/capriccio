@@ -68,16 +68,18 @@ public class ManualFunctionBenchmarks {
             1
         };
 
-        if (args.length > 0) {
-            Function<int[], Integer> func = FUNCS.get(args[0]);
+        int executionCount = Integer.parseInt(args[0]);
+
+        if (args.length > 1) {
+            Function<int[], Integer> func = FUNCS.get(args[1]);
 
             // warm up
             for (int i = 0; i < WARMUP_EXECUTIONS; i++) {
                 func.apply(input);
             }
 
-            double averageTime = doBenchmark(func, input, 1);
-            System.out.println(args[0] + "," + averageTime);
+            double averageTime = doBenchmark(func, input, executionCount);
+            System.out.println(args[1] + "," + averageTime);
         } else {
             for (Map.Entry<String, Function<int[], Integer>> entry : FUNCS.entrySet()) {
                 Function<int[], Integer> func = entry.getValue();
@@ -87,7 +89,7 @@ public class ManualFunctionBenchmarks {
                     func.apply(input);
                 }
 
-                double averageTime = doBenchmark(func, input, 1);
+                double averageTime = doBenchmark(func, input, executionCount);
                 System.out.println(entry.getKey() + "," + averageTime);
             }
         }

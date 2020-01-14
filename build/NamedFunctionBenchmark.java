@@ -36,7 +36,7 @@ public class NamedFunctionBenchmark {
     /**
      * The number of times to call the function for warm up.
      */
-    private static final int WARM_UP_ITERATIONS = 15_000;
+    private static final int WARM_UP_ITERATIONS = 20_000;
 
     /**
      * Constructs a new {@link NamedFunctionBenchmark} for the given values.

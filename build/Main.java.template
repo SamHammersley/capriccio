@@ -47,7 +47,7 @@ public class Main {
                 // Read source from file.
                 String source = readFileText(file.toString());
 
-                sources.put(file.toString(), source);
+                sources.put(file.getName(), source);
             }
         }
 
@@ -74,35 +74,35 @@ public class Main {
             {{ function_registration }}
         );
 
-        if (args[0].equals("-b")) {
-            boolean warmUp = Boolean.parseBoolean(args[1]);
-            int executions = Integer.parseInt(args[2]);
-
-            if (args.length > 3) {
-                String functionName = args[3];
-
-                for (NamedFunction<int[], Integer> f : funcs) {
-                    if (f.getName().equalsIgnoreCase(functionName)) {
-                        new NamedFunctionBenchmark(f, executions, warmUp).runBenchmarkRandomInput();
-                    }
-                }
-            } else {
-                funcs.stream()
-                    .map(f -> new NamedFunctionBenchmark(f, executions, warmUp))
-                    .forEach(NamedFunctionBenchmark::runBenchmarkRandomInput);
-            }
-            return;
-        }
-
         // Set up evaluator with user-specified functions.
         Evaluator evaluator = new Evaluator();
         evaluator.addFunctions(funcs);
 
-        File[] inputFiles = Arrays.stream(args).map(File::new).toArray(File[]::new);
+        if (args[0].equals("-b")) {
+            boolean warmUp = Boolean.parseBoolean(args[1]);
+            boolean calcy = Boolean.parseBoolean(args[2]);
+            int executions = Integer.parseInt(args[3]);
 
-        Map<String, String> sources = readInputFiles(inputFiles);
+            if (!calcy) {
+                final String functionName = args.length > 4 ? args[4] : "not_specified";
 
-        sources.forEach((x, y) -> System.out.println(x + " : " + evaluate(tokenizer, evaluator, y, x)));
+                funcs.stream()
+                    .filter(f -> functionName.equals("not_specified") 
+                              || f.getName().equalsIgnoreCase(functionName))
+                    .map(f -> new NamedFunctionBenchmark(f, executions, warmUp))
+                    .forEach(NamedFunctionBenchmark::runBenchmarkRandomInput);
+            } else {
+
+                doCalcyBenchmarks(tokenizer, evaluator, warmUp, executions);
+            }
+        } else {
+
+            File[] inputFiles = Arrays.stream(args).map(File::new).toArray(File[]::new);
+
+            Map<String, String> sources = readInputFiles(inputFiles);
+
+            sources.forEach((x, y) -> System.out.println(x + " : " + evaluate(tokenizer, evaluator, y, x)));
+        }
     }
 
     /**
@@ -132,4 +132,27 @@ public class Main {
         throw new RuntimeException("Failed to evaluate the given source!");
     }
 
+    static void doCalcyBenchmarks(Tokenizer tokenizer, Evaluator evaluator, boolean warmUp, int executions) throws IOException {
+        File benchmarkDir = new File("examples/benchmarks");
+        Map<String, String> sources = readInputFiles(benchmarkDir);
+
+        for (Map.Entry<String, String> entry : sources.entrySet()) {
+            for (int i = 0; i < 20000 && warmUp; i++) {
+                evaluate(tokenizer, evaluator, entry.getValue(), entry.getKey());
+            }
+
+            double averageTime = 0;
+
+            for (int i = 0; i < executions; i++) {
+                long start = System.nanoTime();
+                evaluate(tokenizer, evaluator, entry.getValue(), entry.getKey());
+                long delta = System.nanoTime() - start;
+
+                averageTime = ((averageTime * i) + delta) / (i + 1);
+            } 
+            String function = entry.getKey().substring(0, entry.getKey().lastIndexOf('.'));
+
+            System.out.println(function + "," + averageTime);
+        }
+    }
 }
